@@ -1,0 +1,20 @@
+println("Guess the number!")
+let secret_number = rand(1, 100)
+
+while true {
+    let guess = input("Input a number: ")
+    let guess = parse_number(guess)
+
+    if not is_nan(guess) {
+        println("You guessed: " + to_string(guess))
+
+        if guess < secret_number {
+            println("Too small!")
+        } else if guess > secret_number {
+            println("Too big!")
+        } else {
+            println("You win!")
+            break
+        }
+    }
+}

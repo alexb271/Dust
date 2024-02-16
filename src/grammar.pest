@@ -1,0 +1,71 @@
+WHITESPACE = _{ " " | "\t" | NEWLINE }
+COMMENT = _{ ("/*" ~ (!"*/" ~ ANY)* ~ "*/") | ("//" ~ (!NEWLINE ~ ANY)* ~ NEWLINE) }
+
+start_symbol = { SOI ~  (function_definition | instruction)* ~ EOI }
+
+function_definition = { "fn" ~ identifier ~ "(" ~ (var_id ~ ("," ~ var_id)*)* ~")" ~ return_type_annotation? ~ "{" ~ instruction* ~"}" }
+return_type_annotation = { "->" ~ identifier }
+
+
+// INSTRUCTIONS
+instruction = _{ branch | while_loop | loop_break | function_return | var_init | var_assign | expression_statement }
+branch = { "if" ~ branch_body ~ branch_else_if* ~ branch_else? }
+branch_body = _{ expression ~ "{" ~ instruction* ~ "}" }
+branch_else_if = { "else" ~ "if" ~ branch_body }
+branch_else = { "else" ~ "{" ~ instruction* ~ "}" }
+while_loop = { "while" ~ expression ~ "{" ~ instruction* ~ "}" }
+loop_break = @{ "break" ~ !(ASCII_ALPHANUMERIC | "_") ~ ";"? }
+function_return = { function_return_keyword ~ expression? ~ ";"? }
+var_init = { "let" ~ var_id ~ ("," ~ var_id)* ~ assign ~ expression ~ ";"? }
+var_assign = { identifier ~ assign ~ expression ~ ";"? }
+expression = { operand ~ (binary_operator ~ operand)* ~ ";"? }
+expression_statement = _{ expression ~ ";"? }
+
+type_annotation = { ":" ~ identifier }
+var_id = { identifier ~ type_annotation? }
+
+function_return_keyword = @{"return" ~ !(ASCII_ALPHANUMERIC | "_") }
+
+
+// OPERANDS
+operand = _{ unary_operator* ~ (literal | function_call | identifier) | unary_operator* ~ left_par ~ expression ~ right_par }
+identifier = @{ (ASCII_ALPHA | "_") ~ (ASCII_ALPHA | ASCII_DIGIT | "_")* }
+function_call = { identifier ~ "(" ~ (expression ~ ("," ~ expression)*)* ~ ")" }
+
+
+// LIETARLS
+literal = _{ number | pi | boolean | text | none}
+number = @{ ASCII_DIGIT+ ~ ("." ~ ASCII_DIGIT+)? }
+pi = @{ "pi" }
+boolean = _{ bool_true | bool_false }
+bool_true = @{ "true" }
+bool_false = @{ "false" }
+text = @{ "\"" ~ (LETTER | MARK | NUMBER | (("\\" ~ "\"") | !"\"" ~ PUNCTUATION) | SEPARATOR | SYMBOL)* ~ "\"" }
+none = @{ "none" }
+
+
+// OPERATORS
+binary_operator = _{ add | sub | mul | div | modulo | pow |
+                     and | or | less_than | greater_than | equal | not_equal }
+
+add = @{ "+" }
+sub = @{ "-" }
+mul = @{ "*" }
+div = @{ "/" }
+modulo = @{ "%" }
+pow = @{ "^" }
+and = @{ "and" }
+or = @{ "or" }
+less_than = @{ "<" }
+greater_than = @{ ">" }
+equal = @{ "==" }
+not_equal = @{ "!=" }
+assign = @{ "=" }
+
+unary_operator = _{ neg | not | gettype }
+neg = @{ "-" }
+not = @{ "not" ~ !(ASCII_ALPHANUMERIC | "_") }
+gettype = @{ "typeof" ~ !(ASCII_ALPHANUMERIC | "_") }
+
+left_par = @{ "(" }
+right_par = @{ ")" }
