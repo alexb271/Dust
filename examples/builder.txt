@@ -1,0 +1,70 @@
+class Car(make: string, model: string, color: string, year: int, vintage: bool) {
+    make: string = make;
+    model: string = model;
+    color: string = color;
+    year: int = year;
+    vintage: bool = vintage;
+
+    pub fn to_string(self) -> string {
+        let result =
+        self.year.to_string() + " " +
+        self.color + " " +
+        self.make + " " +
+        self.model;
+
+        if self.vintage {
+            result = result + ", which is vintage";
+        } else {
+            result = result + ", which is not vintage";
+        }
+
+        return result;
+    }
+}
+
+class CarBuilder {
+    make: string = "";
+    model: string = "";
+    color: string = "";
+    year: int = 0;
+    vintage: bool = false;
+
+    pub fn set_make(self, make: string) -> CarBuilder {
+        self.make = make;
+        return self;
+    }
+
+    pub fn set_model(self, model: string) -> CarBuilder {
+        self.model = model;
+        return self;
+    }
+
+    pub fn set_color(self, color: string) -> CarBuilder {
+        self.color = color;
+        return self;
+    }
+
+    pub fn set_year(self, year: int) -> CarBuilder {
+        self.year = year;
+        return self;
+    }
+
+    pub fn set_vintage(self, vintage: bool) -> CarBuilder {
+        self.vintage = vintage;
+        return self;
+    }
+
+    pub fn build(self) -> Car {
+        return Car::new(self.make, self.model, self.color, self.year, self.vintage);
+        return self;
+    }
+}
+
+let car = CarBuilder::new()
+    .set_make("BMW")
+    .set_model("M3 GTR")
+    .set_color("White And Blue")
+    .set_year(2001)
+    .build();
+
+println(car.to_string());

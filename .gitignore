@@ -1,0 +1,8 @@
+/target
+
+# VIM
+*.swp
+*.vim
+
+# macOS
+.DS_Store

@@ -1,0 +1,90 @@
+WHITESPACE = _{ " " | "\t" | NEWLINE }
+COMMENT = _{ ("/*" ~ (!"*/" ~ ANY)* ~ "*/") | ("//" ~ (!NEWLINE ~ ANY)* ~ NEWLINE) }
+
+start_symbol = { SOI ~  (function_definition | class_definition | instruction)* ~ EOI }
+
+
+// CLASS DEFINITION
+class_definition = { "class" ~ identifier ~ constructor_parameters? ~ "{" ~ (class_function_definition | property_definition)* ~ "}" }
+constructor_parameters = { "(" ~ (var_id ~ ("," ~ var_id)*)? ~ ")" }
+class_function_definition = { pub_keyword? ~ function_definition }
+property_definition = { pub_keyword? ~ var_id ~ assign ~ expression_statement }
+pub_keyword = @{"pub"}
+
+
+// FUNCTION DEFINITION
+function_definition = { function_signature ~ "{" ~ instruction* ~"}" }
+function_signature = { "fn" ~ identifier ~ "(" ~ ((self_keyword | var_id)  ~ ("," ~ var_id)*)? ~")" ~ return_type_annotation? }
+var_id = { identifier ~ type_annotation? }
+type_annotation = { ":" ~ identifier }
+return_type_annotation = { "->" ~ identifier }
+self_keyword = @{"self"}
+
+
+// INSTRUCTIONS
+instruction = _{ branch | while_loop | for_loop | loop_break | function_return | var_init | var_assign | expression_statement }
+
+branch = { "if" ~ branch_body ~ branch_else_if* ~ branch_else? }
+branch_body = _{ expression ~ "{" ~ instruction* ~ "}" }
+branch_else_if = { "else" ~ "if" ~ branch_body }
+branch_else = { "else" ~ "{" ~ instruction* ~ "}" }
+while_loop = { "while" ~ expression ~ "{" ~ instruction* ~ "}" }
+for_loop = { "for" ~ identifier ~ "in" ~ expression ~ "{" ~ instruction* ~ "}" }
+loop_break = @{ "break" ~ !(ASCII_ALPHANUMERIC | "_") ~ ";"? }
+function_return = { function_return_keyword ~ expression? ~ ";"? }
+var_init = { "let" ~ var_id ~ ("," ~ var_id)* ~ assign ~ expression ~ ";"? }
+var_assign = { source_chain? ~ identifier ~ assign ~ expression ~ ";"? }
+expression = { operand ~ (binary_operator ~ operand)* }
+expression_statement = _{ expression ~ ";"? }
+
+function_return_keyword = @{"return" ~ !(ASCII_ALPHANUMERIC | "_") }
+source_chain = { ((function_call | identifier) ~ dot)+ }
+
+
+// OPERANDS
+operand = _{ unary_operator* ~ (function_call | literal | identifier ) | unary_operator* ~ left_par ~ expression ~ right_par }
+
+identifier = @{ (ASCII_ALPHA | "_") ~ (ASCII_ALPHA | ASCII_DIGIT | "_")* }
+function_call = { scope? ~ identifier ~ "(" ~ (expression ~ ("," ~ expression)*)? ~ ")" }
+scope = { identifier ~ scope_res }
+scope_res = @{ "::" }
+
+
+// LIETARLS
+literal = _{ number | boolean | text | none}
+
+number = @{ ASCII_DIGIT+ ~ ("." ~ ASCII_DIGIT+)? }
+boolean = _{ bool_true | bool_false }
+bool_true = @{ "true" }
+bool_false = @{ "false" }
+text = @{ "\"" ~ (LETTER | MARK | NUMBER | (("\\" ~ ("\"" | "\\")) | !"\"" ~ PUNCTUATION) | SEPARATOR | SYMBOL)* ~ "\"" }
+none = @{ "none" }
+
+
+// OPERATORS
+binary_operator = _{ add | sub | mul | div | modulo | pow |
+                     and | or | less_than | greater_than | equal | not_equal | dot }
+
+add = @{ "+" }
+sub = @{ "-" }
+mul = @{ "*" }
+div = @{ "/" }
+modulo = @{ "%" }
+pow = @{ "^" }
+and = @{ "and" }
+or = @{ "or" }
+less_than = @{ "<" }
+greater_than = @{ ">" }
+equal = @{ "==" }
+not_equal = @{ "!=" }
+assign = @{ "=" }
+dot = @{ "." }
+
+unary_operator = _{ neg | not | gettype }
+
+neg = @{ "-" }
+not = @{ "not" ~ !(ASCII_ALPHANUMERIC | "_") }
+gettype = @{ "typeof" ~ !(ASCII_ALPHANUMERIC | "_") }
+
+left_par = @{ "(" }
+right_par = @{ ")" }

@@ -1,0 +1,21 @@
+println("Guess the number!")
+let secret_number = rand(1, 100)
+
+while true {
+    let guess = input("Input a number: ")
+    let guess = float::parse(guess)
+
+    if guess.is_ok() {
+        let guess = guess.value();
+        println("You guessed: " + guess.to_string())
+
+        if guess < secret_number {
+            println("Too small!")
+        } else if guess > secret_number {
+            println("Too big!")
+        } else {
+            println("You win!")
+            break
+        }
+    }
+}
