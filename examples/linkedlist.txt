@@ -1,0 +1,132 @@
+class LinkedList {
+    pub value: dyn = none;
+    next: dyn = none;
+
+    pub fn next(self) -> dyn {
+        return self.next;
+    }
+
+    pub fn push(self, value: dyn) {
+        let node: dyn = self;
+        let next_node: dyn = self.next;
+
+        while next_node != none {
+            node = next_node;
+            next_node = node.next;
+        }
+
+        node.value = value;
+        let new_next = LinkedList::new();
+        node.next = new_next;
+    }
+
+    pub fn get(self, index: int) -> dyn {
+        let node = self.seek(index);
+        if node == none { return none; }
+        return node.value;
+    }
+
+    pub fn set(self, index: int, value: dyn) {
+        let node = self.seek(index);
+        if node == none { return; }
+        node.value = value;
+    }
+
+    pub fn del(self, index: int) {
+        if index < 0 { return; }
+        if index == 0 {
+            if self.next == none {
+                self.value = none;
+                return;
+            } else {
+                self.value = self.next.value;
+                self.next = self.next.next;
+                return;
+            }
+        }
+
+        let current: dyn = self;
+        let previous: dyn = none;
+        let i = 0;
+
+        while i < index and current.next != none  {
+            previous = current;
+            current = current.next;
+            i = i + 1;
+        }
+
+        if current.next != none {
+            previous.next = current.next;
+        }
+    }
+
+    fn seek(self, index: int) -> dyn {
+        let node: dyn = self;
+        let next_node: dyn = self.next;
+
+        let i: int = 0;
+        while i < index {
+            if next_node == none {
+                return none;
+            }
+            node = next_node;
+            next_node = node.next;
+            i = i + 1;
+        }
+
+        return node;
+    }
+}
+
+let linked_list = LinkedList::new();
+
+linked_list.push(5);
+linked_list.push(6);
+linked_list.push(7);
+linked_list.push(8);
+linked_list.push(9);
+
+linked_list.set(0, linked_list.get(0) * 2);
+if linked_list.get(0) != 10 {
+    panic("Expected: 10, Got: " + linked_list.get(0).to_string());
+}
+
+linked_list.set(1, linked_list.get(1) * 2);
+if linked_list.get(1) != 12 {
+    panic("Expected: 12, Got: " + linked_list.get(1).to_string());
+}
+
+linked_list.set(2, linked_list.get(2) * 2);
+if linked_list.get(2) != 14 {
+    panic("Expected: 14, Got: " + linked_list.get(2).to_string());
+}
+
+linked_list.set(3, linked_list.get(3) * 2);
+if linked_list.get(3) != 16 {
+    panic("Expected: 16, Got: " + linked_list.get(3).to_string());
+}
+
+linked_list.set(4, linked_list.get(4) * 2);
+if linked_list.get(4) != 18 {
+    panic("Expected: 18, Got: " + linked_list.get(4).to_string());
+}
+
+linked_list.del(0);
+if linked_list.get(0) != 12 {
+    panic("Expected: 12, Got: " + linked_list.get(0).to_string());
+}
+
+linked_list.del(3);
+if linked_list.get(2) != 16 {
+    panic("Expected: 16, Got: " + linked_list.get(2).to_string());
+}
+
+linked_list.del(1);
+if linked_list.get(1) != 16 {
+    panic("Expected: 16, Got: " + linked_list.get(1).to_string());
+}
+if linked_list.get(0) != 12 {
+    panic("Expected: 12, Got: " + linked_list.get(1).to_string());
+}
+
+println("All good!");

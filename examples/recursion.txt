@@ -1,0 +1,27 @@
+fn fibonacci(n: int) -> int {
+    if n == 1 {
+        return 0
+    }
+    else if n == 2{
+        return 1
+    }
+    else {
+        return fibonacci(n - 1) + fibonacci(n - 2)
+    }
+}
+
+let i = 0
+while i < 10 {
+    i = i + 1
+    print("Fibonacci number #" + i.to_string() + ": ")
+    println(fibonacci(i))
+}
+
+fn power(base: int, exponent: int) -> int {
+    if (exponent == 0) {
+      return 1
+    }
+    return base * power(base, exponent - 1)
+}
+
+println("2 to the power of 8: " + power(2, 8).to_string())

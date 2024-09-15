@@ -1,0 +1,39 @@
+class MovementComponent(owner: dyn, speed: float) {
+    owner: dyn = owner;
+    speed: float = speed;
+
+    pub fn add_movement_input(self, amount: float) {
+        let current_pos = self.owner.get_pos();
+        let new_pos = current_pos + self.speed * amount;
+        self.owner.set_pos(new_pos);
+    }
+}
+
+class Actor(pos: float, components: Vec) {
+    pos: float = pos;
+    components: Vec = components;
+
+    pub fn create() -> Actor {
+        let actor = Actor::new(0.0, Vec::new());
+        let mc = MovementComponent::new(actor, 15.0);
+        actor.components.push(mc);
+        return actor;
+    }
+
+    pub fn get_pos(self) -> float {
+        return self.pos;
+    }
+
+    pub fn set_pos(self, pos: float) {
+        self.pos = pos;
+    }
+
+    pub fn move_forward(self, amount: float) {
+        self.components.get(0).add_movement_input(amount);
+    }
+}
+
+let a = Actor::create();
+println("Position: " + a.get_pos().to_string());
+a.move_forward(0.5);
+println("Position: " + a.get_pos().to_string());

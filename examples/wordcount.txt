@@ -1,0 +1,83 @@
+class WordCount(word: string) {
+    pub word: string = word;
+    pub count: int = 1;
+
+    pub fn increment(self) {
+        self.count = self.count + 1;
+    }
+
+    pub fn to_string(self) -> string {
+        return self.word + ": " + self.count.to_string();
+    }
+}
+
+// sort by count primarily and in case of ties alphabetically
+fn sort_word_counts(word_counts: Vec) {
+    let len = word_counts.len();
+
+    for i in range(0, len) {
+        let max_idx = i;
+        for j in range(i + 1, len) {
+            if (word_counts.get(j).count > word_counts.get(max_idx).count) or
+               (word_counts.get(j).count == word_counts.get(max_idx).count and
+                word_counts.get(j).word < word_counts.get(max_idx).word) {
+                max_idx = j;
+            }
+        }
+
+        // only swap if necessary
+        if i != max_idx {
+            let temp = word_counts.get(i);
+            word_counts.set(i, word_counts.get(max_idx));
+            word_counts.set(max_idx, temp);
+        }
+    }
+}
+
+fn find_word(word: string, word_counts: Vec) -> dyn {
+    for item in word_counts {
+        if item.word == word {
+            return item;
+        }
+    }
+    return none;
+}
+
+fn main() {
+    let file_read = File::read("poem.txt");
+    if file_read.is_ok() {
+        let poem = file_read.value().trim();
+    } else {
+        println("Error opening \"poem.txt\": " + file_read.value());
+        println("Please make sure that \"poem.txt\" is in the current working directory.");
+        return;
+    }
+
+    let word_counts = Vec::new();
+    let words = Vec::new();
+
+    for line in poem.split("\n") {
+        if not line.starts_with("#") and line.len() > 0 {
+            for word in line.split(" ") {
+                words.push(word);
+            }
+        }
+    }
+
+    for word in words {
+        let current = find_word(word, word_counts);
+        if current != none {
+            current.increment();
+        } else {
+            word_counts.push(WordCount::new(word));
+        }
+    }
+
+    sort_word_counts(word_counts);
+
+    for item in word_counts {
+        println(item.to_string());
+    }
+}
+
+main();

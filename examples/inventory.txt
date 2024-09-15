@@ -1,0 +1,115 @@
+class Product(name: string, price: int, on_sale: bool) {
+    pub name: string = name;
+    pub price: int = price;
+    pub on_sale: bool = on_sale;
+
+    pub fn to_string(self) -> string {
+        return
+        "Name: " + self.name + ", " +
+        "Price: " + self.price.to_string() + ", " +
+        "On Sale: " + self.on_sale.to_string();
+    }
+
+}
+
+class User {
+    pub fn get_number(prompt: string) -> int {
+        let num: dyn = none;
+        while num == none {
+            let user_input = input(prompt);
+            let parse = float::parse(user_input);
+            if parse.is_ok() {
+                num = parse.value();
+            }
+        }
+        return num.to_int();
+    }
+
+    pub fn get_bool(prompt: string, val_true: string, val_false: string) -> bool {
+        let result: dyn = none;
+        while result == none {
+            let user_input = input(prompt);
+            if user_input == val_true {
+                result = true;
+            } else if user_input == val_false {
+                result = false;
+            }
+        }
+        return result;
+    }
+}
+
+class Program {
+    menu: string = "Product Inventory\n\n1. List\n2. Add Item\n3. Edit Item\n4. Remove Item\n5. Quit\n";
+    db: Vec = Vec::new();
+
+    pub fn run(self) {
+        while true {
+            println(self.menu);
+            let input: int = User::get_number(">> ");
+            if input == 1 {
+                self.list();
+            } else if input == 2 {
+                self.add_item();
+            } else if input == 3 {
+                self.edit_item();
+            } else if input == 4 {
+                self.remove_item();
+            } else if input == 5 {
+                break;
+            }
+        }
+    }
+
+    fn list(self) {
+        println("List\n");
+
+        let index = 0;
+        while index < self.db.len() {
+            print((index + 1).to_string() + ". ");
+            println(self.db.get(index).to_string());
+            index = index + 1;
+        }
+    }
+
+    fn add_item(self) {
+        println("Add item\n");
+
+        let name = input("Input product name: ");
+        let price = User::get_number("Input product price: ")
+        let on_sale = User::get_bool("On sale?[Yes/No]", "Yes", "No");
+
+        let new_product = Product::new(name, price, on_sale);
+        self.db.push(new_product);
+    }
+
+    fn edit_item(self) {
+        println("Edit item\n");
+        let index = User::get_number("Index to edit: ") - 1;
+        if not (index < 0) and index < self.db.len() {
+            let item = self.db.get(index);
+            println(item.to_string() + "\n");
+
+            let new_name = input("Input product name: ");
+            let new_price = User::get_number("Input product price: ")
+            let new_on_sale = User::get_bool("On sale?[Yes/No]", "Yes", "No");
+
+            item.name = new_name;
+            item.price = new_price;
+            item.on_sale = new_on_sale;
+        } else {
+            println("No item found at index " + (index + 1).to_string());
+        }
+    }
+
+    fn remove_item(self) {
+        println("Remove item\n");
+        let index = User::get_number("Index to delete: ") - 1;
+        if not (index < 0) and index < self.db.len() {
+            self.db.remove(index);
+        }
+    }
+}
+
+let program = Program::new();
+program.run();
